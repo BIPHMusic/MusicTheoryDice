@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Theory Dice Simulator</title>
+    <link rel="icon" href="/icons/BGicon.png">
+    <style>
+        @font-face {
+            font-family: 'Zapfino';
+            src: url('fonts/Zapfino.ttf') format('truetype');
+        }
+
+        body {
+            background-color: rgb(45, 70, 119);
+            font-family: 'Andika', sans-serif;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .Title {
+            font-family: sans-serif;
+            color: white;
+            font-size: 200%;
+            text-align: center;
+            text-decoration: none;
+            min-width: fit-content;
+            white-space: nowrap;
+            margin-bottom: 10px;
+        }
+
+        .Subtitle {
+            font-family: 'Zapfino', sans-serif;
+            color: white;
+            font-size: 220%;
+            text-align: center;
+            text-decoration: none;
+            min-width: fit-content;
+            white-space: nowrap;
+            margin-top: 0;
+        }
+
+        .dice-icons {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-top: 20px;
+            position: absolute;
+            left: 20px;
+            top: 80px;
+        }
+
+        .dice-icon-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .dice-icon-container:hover {
+            transform: scale(1.05);
+        }
+
+        .dice-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .dice-name {
+            font-size: 14px;
+        }
+
+        #selected-die {
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        #result {
+            font-size: 48px;
+            margin: 10px 0;
+            min-height: 60px;
+            text-align: center;
+            background-color: rgba(15, 22, 33, 0.441);
+            border-radius: 10px;
+            padding: 10px 20px;
+            width: 60%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.2s ease-out;
+        }
+
+        @keyframes subtlePulse {
+            0% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.02); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.9; }
+        }
+
+        .subtle-pulse {
+            animation: subtlePulse 0.2s ease-out;
+        }
+
+        button {
+            font-size: 18px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.2s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .BGLogo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: -100;
+        }
+
+        .BGLogo img {
+            opacity: 0.05;
+        }
+
+           /* Hamburger Menu Styles */
+    .hamburger-menu {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+    }
+
+    .menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        width: 30px;
+        height: 25px;
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        z-index: 1001;
+    }
+
+    .menu-toggle span {
+        width: 30px;
+        height: 3px;
+        background: white;
+        border-radius: 10px;
+        transition: all 0.3s linear;
+    }
+
+    .menu-toggle.open span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+    }
+
+    .menu-toggle.open span:nth-child(2) {
+        opacity: 0;
+    }
+
+    .menu-toggle.open span:nth-child(3) {
+        transform: rotate(-45deg) translate(7px, -7px);
+    }
+
+    .menu-items {
+        position: absolute;
+        top: 25;
+        left: -250px;
+        background: rgba(75, 100, 149, 0.951);
+        width: 250px;
+        height: 91vh;
+        padding-top: 20px;
+        transition: all 0.3s ease-in-out;
+        opacity: 0;
+    }
+
+    .menu-items.show {
+        left: 0;
+        opacity: 1;
+    }
+
+    .menu-items a {
+        display: block;
+        padding: 15px 20px;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.2s;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    }
+
+    .menu-items.show a {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .menu-items a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .menu-items a:nth-child(1) { transition-delay: 0.1s; }
+    .menu-items a:nth-child(2) { transition-delay: 0.2s; }
+    .menu-items a:nth-child(3) { transition-delay: 0.3s; }
+    .menu-items a:nth-child(4) { transition-delay: 0.4s; }
+    .menu-items a:nth-child(5) { transition-delay: 0.5s; }
+    .menu-items a:nth-child(6) { transition-delay: 0.6s; }
+
+    /* Adjusted style for the menu title */
+    .menu-title {
+        text-align: center;
+        color: white;
+        font-size: 18px; /* Slightly smaller */
+        margin-bottom: 10px; /* Reduced margin */
+    }
+
+    /* Style for the footer text */
+    .menu-footer {
+        position: absolute;
+        bottom: 10px;
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-size: 12px; /* Small font size */
+    }
+</style>
+</head>
+<body>
+    <div class="hamburger-menu">
+        <button class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="menu-items" id="menu-items">
+            <div class="menu-title">BIPH Music</div>
+            <a href="#">Home</a>
+            <a href="#">Scale Generator</a>
+            <a href="#">Chord Generator</a>
+            <a href="#">Ear Training</a>
+            <a href="#">About</a>
+            <div class="menu-footer">© Garrison Tubbs 2024</div>
+        </div>
+    </div>
+
+
+    <h1 class="Title">BIPH Music</h1>
+    <h1 class="Subtitle">Music Theory Dice Simulator</h1>
+
+    <div class="dice-icons" id="dice-icons"></div>
+    <p id="selected-die"></p>
+    <div id="result">-</div>
+    <button onclick="rollDice()">Roll Dice</button>
+
+    <div class="BGLogo">
+        <img src="https://i.postimg.cc/FKjG7zKB/BG-5percent.png" alt="Background logo">
+    </div>
+
+    <script>
+        const diceResults = {
+            "Solfege": ["Do", "Re", "Mi", "Fa", "Sol", "La", "Ti", "Do"],
+            "White Keys": ["C", "D", "E", "F", "G", "A", "B", "C"],
+            "Major Roman Numerals": ["I", "ii", "iii", "IV", "V", "vi", "vii", "I"],
+            "Minor Roman Numerals": ["I", "iiº", "III", "iv", "V", "v", "VI", "VII", "viiº"],
+            "Secondary Function": ["V/ii", "V/iii", "V/IV", "V/V", "V/vi", "vii/ii", "vii/iii", "vii/IV", "vii/V", "vii/vi"],
+            "All Notes": ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
+            "Key Signatures": ["C Major", "C# Major", "D Major", "Db Major", "Eb Major", "E Major", "F Major", "F# Major", "Gb Major", "G Major", "Ab Major", "A Major", "Bb Major", "B Major", "Cb Major"],
+            "# of Accidentals": ["0 sharps or flats", "1 Sharp", "2 Sharps", "3 Sharps", "4 Sharps", "5 Sharps", "6 Sharps", "7 Sharps", "1 Flat", "2 Flats", "3 Flats", "4 Flats", "5 Flats", "6 Flats", "7 Flats"]
+        };
+
+        let selectedDice = "Solfege";
+
+        function createDiceIcon(diceName, color) {
+            const sides = diceName === "Secondary Function" ? 10 : 
+                          diceName === "All Notes" ? 12 : 
+                          diceName === "Minor Roman Numerals" ? 9 :
+                          diceName.startsWith("Key") || diceName.startsWith("#") ? 15 : 8;
+            const container = document.createElement('div');
+            container.className = 'dice-icon-container';
+            container.onclick = () => selectDice(diceName);
+
+            const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            svg.setAttribute('class', 'dice-icon');
+            svg.setAttribute('viewBox', '0 0 100 100');
+
+            let shape;
+            if (sides === 8) {
+                shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                shape.setAttribute('points', '50,5 95,50 50,95 5,50');
+            } else if (sides === 9) {
+                shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                shape.setAttribute('points', '50,5 90,15 95,55 75,90 25,90 5,55 10,15');
+            } else if (sides === 10) {
+                shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                shape.setAttribute('points', '50,5 90,20 95,60 75,90 25,90 5,60 10,20');
+            } else if (sides === 12) {
+                shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                shape.setAttribute('points', '50,5 90,25 90,75 50,95 10,75 10,25');
+            } else if (sides === 15) {
+                shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                shape.setAttribute('cx', '50');
+                shape.setAttribute('cy', '50');
+                shape.setAttribute('r', '45');
+            }
+            shape.setAttribute('fill', color);
+            svg.appendChild(shape);
+
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute('x', '50');
+            text.setAttribute('y', '60');
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('fill', 'white');
+            text.setAttribute('font-size', '30');
+            text.textContent = `D${sides}`;
+            svg.appendChild(text);
+
+            container.appendChild(svg);
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'dice-name';
+            nameSpan.textContent = diceName;
+            container.appendChild(nameSpan);
+
+            return container;
+        }
+
+        function selectDice(diceName) {
+            selectedDice = diceName;
+            document.getElementById('selected-die').textContent = `Selected: ${diceName}`;
+            rollDice();
+        }
+
+        function rollDice() {
+            const result = diceResults[selectedDice][Math.floor(Math.random() * diceResults[selectedDice].length)];
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = result;
+            resultElement.classList.remove('subtle-pulse');
+            void resultElement.offsetWidth; // Trigger reflow
+            resultElement.classList.add('subtle-pulse');
+        }
+
+        // Create dice icons
+        const diceColors = ['#3498db', '#e74c3c', '#9b59b6', '#f1c40f', '#1abc9c', '#e67e22', '#2ecc71', '#95a5a6'];
+        let colorIndex = 0;
+        for (const diceName in diceResults) {
+            const diceIcon = createDiceIcon(diceName, diceColors[colorIndex]);
+            document.getElementById('dice-icons').appendChild(diceIcon);
+            colorIndex = (colorIndex + 1) % diceColors.length;
+        }
+
+        // Set initial selected die and roll
+        selectDice("Solfege");
+
+        // Add spacebar event listener
+        document.addEventListener('keydown', function(event) {
+            if (event.code === 'Space') {
+                event.preventDefault();
+                rollDice();
+            }
+        });
+
+        // Hamburger menu toggle function
+        function toggleMenu() {
+            const menuToggle = document.querySelector('.menu-toggle');
+            const menuItems = document.getElementById('menu-items');
+            menuToggle.classList.toggle('open');
+            menuItems.classList.toggle('show');
+        }
+    </script>
+</body>
+</html>
