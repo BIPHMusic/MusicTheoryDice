@@ -282,7 +282,7 @@
             "Secondary Function": ["V/ii", "V/iii", "V/IV", "V/V", "V/vi", "vii/ii", "vii/iii", "vii/IV", "vii/V", "vii/vi"],
             "All Notes": ["C", "C#", "D", "Eb", "E", "F", "F#", "G", "Ab", "A", "Bb", "B"],
             "Key Signatures": ["C Major", "C# Major", "D Major", "Db Major", "Eb Major", "E Major", "F Major", "F# Major", "Gb Major", "G Major", "Ab Major", "A Major", "Bb Major", "B Major", "Cb Major"],
-            "# of Accidentals": ["0 sharps or flats", "1 Sharp", "2 Sharps", "3 Sharps", "4 Sharps", "5 Sharps", "6 Sharps", "7 Sharps", "1 Flat", "2 Flats", "3 Flats", "4 Flats", "5 Flats", "6 Flats", "7 Flats"]
+            "# of Accidentals": ["0 Accidentals", "1 Sharp", "2 Sharps", "3 Sharps", "4 Sharps", "5 Sharps", "6 Sharps", "7 Sharps", "1 Flat", "2 Flats", "3 Flats", "4 Flats", "5 Flats", "6 Flats", "7 Flats"]
         };
 
         let selectedDice = "Solfege";
@@ -313,12 +313,25 @@
             } else if (sides === 12) {
                 shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
                 shape.setAttribute('points', '50,5 90,25 90,75 50,95 10,75 10,25');
-            } else if (sides === 15) {
-                shape = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                shape.setAttribute('cx', '50');
-                shape.setAttribute('cy', '50');
-                shape.setAttribute('r', '45');
-            }
+              } else if (sides === 15) {
+    shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+
+    // Function to generate points for a regular polygon
+    const generatePolygonPoints = (sides, radius, centerX, centerY) => {
+        const points = [];
+        for (let i = 0; i < sides; i++) {
+            const angle = (i * 2 * Math.PI) / sides;
+            const x = centerX + radius * Math.cos(angle);
+            const y = centerY + radius * Math.sin(angle);
+            points.push(`${x},${y}`);
+        }
+        return points.join(' ');
+    };
+
+    // Set points for a 15-sided polygon
+    const points = generatePolygonPoints(8, 45, 50, 50); // 15 sides, radius 45, center (50, 50)
+    shape.setAttribute('points', points);
+}
             shape.setAttribute('fill', color);
             svg.appendChild(shape);
 
