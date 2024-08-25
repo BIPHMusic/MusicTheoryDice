@@ -180,7 +180,7 @@
         .roll-dice-button {
     font-size: 1.2rem;
     padding: 12px 24px;
-    background-color: #939393;
+    background-color: var(--dice-color, #4575a0); /* Default to #4575a0 if --dice-color is not set */
     margin-top: 20px;
     color: white;
     border: none;
@@ -190,12 +190,14 @@
 }
 
 .roll-dice-button:hover {
-    background-color: #4575a0;
+    filter: brightness(1.1);
 }
 
 .roll-dice-button:active {
-    background-color: #b6b6b6;
+    filter: brightness(0.9);
 }
+
+
 
         @keyframes subtlePulse {
             0% { transform: scale(1); opacity: 0.9; }
@@ -479,8 +481,14 @@ function updateSelectedDieIcon() {
     // Update the top-left icon
     const selectedDieIcon = document.getElementById('selected-die-icon');
     selectedDieIcon.innerHTML = ''; // Clear previous icon
-    const diceIcon = createDiceIcon(selectedDice, getDiceColor(selectedDice));
+    const diceColor = getDiceColor(selectedDice);
+    const diceIcon = createDiceIcon(selectedDice, diceColor);
     selectedDieIcon.appendChild(diceIcon);
+
+    // Update the Roll Dice button color
+    const rollButton = document.querySelector('.roll-dice-button');
+    rollButton.style.setProperty('--dice-color', diceColor);
+
 
     // Update the selected die in the menu if needed
     const selectedDieElement = document.getElementById('selected-die');
@@ -553,7 +561,7 @@ function animatetopleftDice() {
 }
 
         function getDiceColor(diceName) {
-            const diceColors = ['#3498db', '#e74c3c', '#9b59b6', '#f1c40f', '#1abc9c', '#e67e22', '#2ecc71', '#95a5a6'];
+            const diceColors = ['#3498db', '#e74c3c', '#9b59b6', '#d4ab0d', '#1abc9c', '#e67e22', '#2ecc71', '#95a5a6'];
             const index = Object.keys(diceResults).indexOf(diceName);
             return diceColors[index % diceColors.length];
         }
