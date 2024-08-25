@@ -7,11 +7,10 @@
     <title>Music Theory Dice Simulator</title>
     <link rel="icon" href="/icons/BGicon.png">
     <style>
-        /* Existing styles */
         @font-face {
-  font-family: 'Zapfino';
-  src: url('fonts/Zapfino.ttf') format('truetype');
-  }
+            font-family: 'Zapfino';
+            src: url('fonts/Zapfino.ttf') format('truetype');
+        }
 
         body {
             background-color: rgb(45, 70, 119);
@@ -26,51 +25,144 @@
             overflow: hidden;
         }
 
-        .Subtitle{
-  font-family: 'Zapfino', sans-serif;
-  color: white;
-  margin-top:-0.7em;
-  font-size: 3.5vw;
-  text-align:center;
-  text-decoration: none;
-  min-width: fit-content;
-  white-space: nowrap;
-  }
+        .Subtitle {
+            font-family: 'Zapfino', sans-serif;
+            color: white;
+            margin-top: -0.7em;
+            font-size: 3.5vw;
+            text-align: center;
+            text-decoration: none;
+            min-width: fit-content;
+            white-space: nowrap;
+        }
 
-        .dice-icons {
+        /* top-left die icon */
+#selected-die-top-left {
+    position: absolute;
+    text-align: center;
+    top: 60px;
+    left: 108px;
+    width: 50px;
+    height: 50px;
+}
+
+/* Center-justified text for the selected die */
+#selected-die-center-screen {
+    font-size: 20px;
+    color: white;
+    margin-top: 0vh;
+    text-align: center;
+    font-family: 'Andika', sans-serif;
+}
+
+
+        .selected-die-container {
+            position: fixed;
+            top: 58px;
+            left: 15px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-            margin-top: 20px;
-            position: absolute;
+            align-items: center;
+            cursor: pointer;
+        }
+
+
+
+        .selected-die {
+            position: relative;
+            opacity:0;
+        }
+
+        .arrow-down {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    margin-top: 50px;
+    margin-left: -50px;
+    transition: transform 0.1s;
+}
+
+.arrow-down::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 8px;
+    width: 8px;
+    border-style: solid;
+    border-width: 2px 2px 0 0;
+    border-color: white;
+    transform: rotate(135deg);
+}
+
+.arrow-down.rotated {
+    transform: translateX(-10px) rotate(180deg);
+}
+
+.more-dice-text {
+    opacity: 0;
+    margin-left: 40px;
+    margin-top: -20px;
+    transition: opacity 0.3s ease;
+}
+
+.selected-die-container:hover .more-dice-text {
+    opacity: 1;
+}
+
+.selected-die-container.menu-open .more-dice-text {
+    opacity: 0;
+}
+
+        .dice-icons {
+            position: fixed;
+            top: 150px;
             left: 20px;
-            top: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+            background: linear-gradient(to right, rgba(45, 70, 119, 1) 0%, rgba(45, 70, 119, 0.9) 75%, rgba(255, 255, 255, 0) 100%);
+        }
+
+        .dice-icons.show {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .dice-icon-container {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
 
-        .dice-icon-container:hover {
+.dice-icon-container:hover {
             transform: scale(1.05);
         }
 
-        .dice-icon {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
+.dice-icon {
+    width: 40px;
+    height: 40px;
+    margin-right: 0px;
+    transform: translate(-50px, -50px) rotate(-180deg);
+    opacity: 0;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
 
-        .dice-name {
-            font-size: 14px;
-            white-space: nowrap;
-            opacity: 1;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-        }
+.dice-name {
+    font-size: 14px;
+    white-space: nowrap;
+    opacity: 0; /* Initially hidden */
+    width: 20vh;
+    transition: opacity 0.5s ease; /* Fade-in transition */
+}
+
+.dice-icons.show .dice-name {
+    opacity: 1;
+}
 
         #result {
             font-size: 48px;
@@ -97,24 +189,12 @@
             animation: subtlePulse 0.2s ease-out;
         }
 
-        /* Media query for small screens */
-        @media (max-width: 768px) {
-            .dice-name {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-
-            .dice-icon-container:hover .dice-name {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
         /* Styles for the hamburger menu (existing styles) */
         .hamburger-menu {
             position: absolute;
+            margin-left: 7px;
             top: 20px;
-            left: 20px;
+            left: 13px;
             z-index: 1000;
         }
 
@@ -127,7 +207,7 @@
             background: transparent;
             border: none;
             cursor: pointer;
-            padding: 0;
+            padding: 20;
             z-index: 1001;
         }
 
@@ -153,7 +233,7 @@
 
         .menu-items {
             position: absolute;
-            top: 25;
+            top: 25px;
             left: -250px;
             background: rgba(75, 100, 149, 0.951);
             width: 250px;
@@ -169,53 +249,50 @@
         }
 
         .menu-items a {
-        display: block;
-        padding: 15px 20px;
-        color: white;
-        text-decoration: none;
-        transition: background-color 0.2s;
-        opacity: 0;
-        transform: translateX(-20px);
-        transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
-    }
+            display: block;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.2s;
+            opacity: 0;
+            transform: translateX(-20px);
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
 
-    .menu-items.show a {
-        opacity: 1;
-        transform: translateX(0);
-    }
+        .menu-items.show a {
+            opacity: 1;
+            transform: translateX(0);
+        }
 
-    .menu-items a:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-    }
+        .menu-items a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
-    .menu-items a:nth-child(1) { transition-delay: 0.1s; }
-    .menu-items a:nth-child(2) { transition-delay: 0.2s; }
-    .menu-items a:nth-child(3) { transition-delay: 0.3s; }
-    .menu-items a:nth-child(4) { transition-delay: 0.4s; }
-    .menu-items a:nth-child(5) { transition-delay: 0.5s; }
-    .menu-items a:nth-child(6) { transition-delay: 0.6s; }
+        .menu-items a:nth-child(1) { transition-delay: 0.1s; }
+        .menu-items a:nth-child(2) { transition-delay: 0.2s; }
+        .menu-items a:nth-child(3) { transition-delay: 0.3s; }
+        .menu-items a:nth-child(4) { transition-delay: 0.4s; }
+        .menu-items a:nth-child(5) { transition-delay: 0.5s; }
+        .menu-items a:nth-child(6) { transition-delay: 0.6s; }
 
-    /* Adjusted style for the menu title */
-    .menu-title {
-        text-align: center;
-        color: white;
-        font-size: 18px; /* Slightly smaller */
-        margin-bottom: 10px; /* Reduced margin */
-    }
+        .menu-title {
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
 
-    /* Style for the footer text */
-    .menu-footer {
-        position: absolute;
-        bottom: 10px;
-        width: 100%;
-        text-align: center;
-        color: white;
-        font-size: 12px; /* Small font size */
-    }
+        .menu-footer {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
-
     <div class="hamburger-menu">
         <button class="menu-toggle" onclick="toggleMenu()">
             <span></span>
@@ -236,16 +313,35 @@
     <h1 class="Title">BIPH Music</h1>
     <h1 class="Subtitle">Music Theory Dice Simulator</h1>
 
+    <div class="selected-die-container" onclick="toggleDiceMenu()">
+        <div class="arrow-down" id="arrow"></div>
+        <div class="more-dice-text">More Dice</div>
+    </div>
+
+    <div class="selected-die-container" id="selected-die-top-left">
+        <div id="selected-die-icon"></div>
+    </div>
+
+    <div class="selected-die-center-screen" id="selected-die-center-screen"></div>
+
+    <div class="dice-icon-container">
+        <div class="dice-icon"></div> <!-- Icon element -->
+    </div>
+
     <div class="dice-icons" id="dice-icons"></div>
-    <p id="selected-die"></p>
+    <div class="selected-die" id="selected-die"></div>
     <div id="result">-</div>
     <button onclick="rollDice()">Roll Dice</button>
 
-    <div class="BGLogo">
-        <img src="https://i.postimg.cc/FKjG7zKB/BG-5percent.png" alt="Background logo">
-    </div>
-
     <script>
+
+window.onload = function() {
+    updateSelectedDieIcon();
+    updateSelectedDieText(); // Update text on page load
+    rollDice(); // Roll the dice on page load
+    animatetopleftDice();
+};
+
         const diceResults = {
             "Solfege": ["Do", "Re", "Mi", "Fa", "Sol", "La", "Ti", "Do"],
             "White Keys": ["C", "D", "E", "F", "G", "A", "B", "C"],
@@ -285,28 +381,26 @@
             } else if (sides === 12) {
                 shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
                 shape.setAttribute('points', '50,5 90,25 90,75 50,95 10,75 10,25');
-              } else if (sides === 15) {
-    shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
-
-    // Function to generate points for a regular polygon
-    const generatePolygonPoints = (sides, radius, centerX, centerY) => {
-        const points = [];
-        for (let i = 0; i < sides; i++) {
-            const angle = (i * 2 * Math.PI) / sides;
-            const x = centerX + radius * Math.cos(angle);
-            const y = centerY + radius * Math.sin(angle);
-            points.push(`${x},${y}`);
-        }
-        return points.join(' ');
-    };
-
-    // Set points for a 15-sided polygon
-    const points = generatePolygonPoints(8, 45, 50, 50); // 15 sides, radius 45, center (50, 50)
-    shape.setAttribute('points', points);
-}
+            } else if (sides === 15) {
+                shape = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                const generatePolygonPoints = (sides, radius, centerX, centerY) => {
+                    const points = [];
+                    for (let i = 0; i < sides; i++) {
+                        const angle = (i * 2 * Math.PI) / sides;
+                        const x = centerX + radius * Math.cos(angle);
+                        const y = centerY + radius * Math.sin(angle);
+                        points.push(`${x},${y}`);
+                    }
+                    return points.join(' ');
+                };
+                const points = generatePolygonPoints(8, 45, 50, 50);
+                shape.setAttribute('points', points);
+            }
             shape.setAttribute('fill', color);
             svg.appendChild(shape);
 
+
+            
             const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
             text.setAttribute('x', '50');
             text.setAttribute('y', '60');
@@ -314,6 +408,34 @@
             text.setAttribute('fill', 'white');
             text.setAttribute('font-size', '30');
             text.textContent = `D${sides}`;
+            switch(diceName) {
+        case "Solfege":
+            text.textContent = "Do";
+            break;
+        case "White Keys":
+            text.textContent = "C";
+            break;
+        case "Major Roman Numerals":
+            text.textContent = "IV";
+            break;
+        case "Minor Roman Numerals":
+            text.textContent = "iv";
+            break;
+        case "Secondary Function":
+            text.textContent = "V/V";
+            break;
+        case "All Notes":
+            text.textContent = "E♭";
+            break;
+        case "Key Signatures":
+            text.textContent = "Key";
+            break;
+        case "# of Accidentals":
+            text.textContent = "#";
+            break;
+        default:
+            text.textContent = `D${sides}`;
+    }
             svg.appendChild(text);
 
             container.appendChild(svg);
@@ -327,31 +449,106 @@
         }
 
         function selectDice(diceName) {
-            selectedDice = diceName;
-            document.getElementById('selected-die').textContent = `Selected: ${diceName}`;
-            rollDice();
-        }
+    selectedDice = diceName;
+    updateSelectedDieIcon();
+    updateSelectedDieText(); // Update the center text element
+    rollDice();
+    toggleDiceMenu();
+}
+
+
+function updateSelectedDieIcon() {
+    // Update the top-left icon
+    const selectedDieIcon = document.getElementById('selected-die-icon');
+    selectedDieIcon.innerHTML = ''; // Clear previous icon
+    const diceIcon = createDiceIcon(selectedDice, getDiceColor(selectedDice));
+    selectedDieIcon.appendChild(diceIcon);
+
+    // Update the selected die in the menu if needed
+    const selectedDieElement = document.getElementById('selected-die');
+    selectedDieElement.innerHTML = '';
+    selectedDieElement.appendChild(diceIcon.cloneNode(true)); // Clone for the menu
+}
+
+function updateSelectedDieText() {
+    // Update the center text to display the name of the selected die
+    const selectedDieText = document.getElementById('selected-die-center-screen');
+    selectedDieText.textContent = `Selected: ${selectedDice}`;
+}
 
         function rollDice() {
             const result = diceResults[selectedDice][Math.floor(Math.random() * diceResults[selectedDice].length)];
             const resultElement = document.getElementById('result');
             resultElement.textContent = result;
             resultElement.classList.remove('subtle-pulse');
-            void resultElement.offsetWidth; // Trigger reflow
+            void resultElement.offsetWidth;
             resultElement.classList.add('subtle-pulse');
         }
 
+        function toggleDiceMenu() {
+            const arrow = document.getElementById('arrow');
+            const container = document.querySelector('.selected-die-container');
+            arrow.classList.toggle('rotated');
+            container.classList.toggle('menu-open');
+            const diceIcons = document.getElementById('dice-icons');
+            diceIcons.classList.toggle('show');
+            animateMenuDiceIcons();
+        }
+
+
+
+function animateMenuDiceIcons() {
+    const diceContainers = document.querySelectorAll('.dice-icon-container');
+
+    diceContainers.forEach((container, index) => {
+        if (!container.classList.contains('selected-die-container')) { // Skip the selected die
+            const diceIcon = container.querySelector('.dice-icon');
+         //   const diceText = container.querySelector('.dice-name');
+
+            setTimeout(() => {
+                diceIcon.style.transition = 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                diceIcon.style.opacity = '1';
+                diceIcon.style.transform = 'translate(0, 0) rotate(360deg)';
+
+              //  setTimeout(() => {
+                  //  diceText.style.opacity = '1';
+             //   }, 200);
+            }, index * 100);
+        }
+    });
+}
+
+function animatetopleftDice() {
+    const topleftDice = document.querySelector('.selected-die-container .dice-icon-container');
+    if (topleftDice) {
+        const topleftIcon = topleftDice.querySelector('.dice-icon');
+       // const topleftText = topleftDice.querySelector('.dice-name');
+
+        topleftIcon.style.transition = 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        topleftIcon.style.opacity = '1';
+        topleftIcon.style.transform = 'translate(0, 0) rotate(360deg)';
+
+      //  setTimeout(() => {
+          //  topleftText.style.opacity = '0';
+     //   }, 200);
+    }
+}
+
+        function getDiceColor(diceName) {
+            const diceColors = ['#3498db', '#e74c3c', '#9b59b6', '#f1c40f', '#1abc9c', '#e67e22', '#2ecc71', '#95a5a6'];
+            const index = Object.keys(diceResults).indexOf(diceName);
+            return diceColors[index % diceColors.length];
+        }
+
         // Create dice icons
-        const diceColors = ['#3498db', '#e74c3c', '#9b59b6', '#f1c40f', '#1abc9c', '#e67e22', '#2ecc71', '#95a5a6'];
-        let colorIndex = 0;
         for (const diceName in diceResults) {
-            const diceIcon = createDiceIcon(diceName, diceColors[colorIndex]);
+            const diceIcon = createDiceIcon(diceName, getDiceColor(diceName));
             document.getElementById('dice-icons').appendChild(diceIcon);
-            colorIndex = (colorIndex + 1) % diceColors.length;
         }
 
         // Set initial selected die and roll
-        selectDice("Solfege");
+        updateSelectedDieIcon();
+        rollDice();
 
         // Add spacebar event listener
         document.addEventListener('keydown', function(event) {
